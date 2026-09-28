@@ -1,0 +1,2 @@
+<?php require 'inc/auth.php';require 'inc/layout.php';require 'inc/crud.php';
+crud('packages','Kelola Paket',['name'=>['Nama Paket','text'],'tagline'=>['Tagline','text'],'price'=>['Harga (Rp)','number'],'max_hours'=>['Durasi Maks (jam)','number'],'features'=>['Fasilitas (satu per baris)','textarea'],'sort_order'=>['Urutan','number'],'is_active'=>['Aktif','check']],['name','price','max_hours','is_active'],'sort_order,id');

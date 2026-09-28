@@ -1,0 +1,7 @@
+<?php require_once __DIR__.'/../inc/lib.php';session_set_cookie_params(['httponly'=>true,'samesite'=>'Lax']);session_start();$err='';
+if(!empty($_SESSION['admin'])){header('Location: dashboard.php');exit;}
+if($_SERVER['REQUEST_METHOD']==='POST'){$u=trim($_POST['u']??'');$s=db()->prepare("SELECT * FROM admins WHERE username=? OR email=?");$s->execute([$u,$u]);$a=$s->fetch();
+if($a&&password_verify($_POST['p']??'',$a['password'])){session_regenerate_id(true);$_SESSION['admin']=$a['id'];header('Location: dashboard.php');exit;}$err='Username/email atau password salah.';}?>
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Login</title><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/style.css"></head>
+<body style="background:var(--bg2);display:grid;place-items:center;min-height:100vh"><form method="post" class="card frm" style="width:min(380px,92vw)"><img src="../assets/logo.png" alt="KisahAbadi" style="width:200px;margin:0 auto"><p class="c mut" style="margin:0">Admin Panel</p><?php if($err):?><div class="alert"><?=e($err)?></div><?php endif;?>
+<label>Username / Email<input name="u" required autofocus></label><label>Password<input name="p" type="password" required></label><button class="btn">LOGIN</button></form></body></html>

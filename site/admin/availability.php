@@ -1,0 +1,9 @@
+<?php require 'inc/auth.php';require 'inc/layout.php';$pdo=db();
+$d=$_GET['d']??date('Y-m-d');$v=$_GET['v']??'month';$un=(int)($_GET['u']??0);$ts=strtotime($d)?:time();
+if($v==='day'){$f=$t=date('Y-m-d',$ts);}elseif($v==='week'){$f=date('Y-m-d',strtotime('monday this week',$ts));$t=date('Y-m-d',strtotime('sunday this week',$ts));}else{$v='month';$f=date('Y-m-01',$ts);$t=date('Y-m-t',$ts);}
+$s=$pdo->prepare("SELECT b.*,p.name pkg,u.name unit FROM bookings b JOIN packages p ON p.id=b.package_id LEFT JOIN units u ON u.id=b.unit_id WHERE b.event_date BETWEEN ? AND ?".($un?" AND b.unit_id=".$un:'')." ORDER BY b.event_date,b.start_time");$s->execute([$f,$t]);
+$units=$pdo->query("SELECT id,name FROM units")->fetchAll(PDO::FETCH_KEY_PAIR);adm_head('Kalender Booking');?>
+<form method="get" class="top" style="margin-bottom:14px"><input type="date" name="d" value="<?=e(date('Y-m-d',$ts))?>" style="width:auto"><select name="v" style="width:auto"><?php foreach(['day'=>'Hari','week'=>'Minggu','month'=>'Bulan'] as $k=>$n):?><option value="<?=$k?>" <?=$v==$k?'selected':''?>><?=$n?></option><?php endforeach;?></select>
+<select name="u" style="width:auto"><option value="0">Semua unit</option><?php foreach($units as $i=>$n):?><option value="<?=$i?>" <?=$un==$i?'selected':''?>><?=e($n)?></option><?php endforeach;?></select><button class="btn sm">TAMPILKAN</button></form>
+<p class="mut"><?=e($f)?> s/d <?=e($t)?></p><div class="tw"><table class="tbl"><tr><th>Tanggal</th><th>Jam</th><th>Nama</th><th>Paket</th><th>Lokasi</th><th>Status</th><th>Unit</th></tr>
+<?php foreach($s as $r):?><tr><td><?=e($r['event_date'])?></td><td><?=substr($r['start_time'],0,5)?>–<?=substr($r['end_time'],0,5)?></td><td><?=e($r['customer_name'])?></td><td><?=e($r['pkg'])?></td><td><?=e($r['location'])?></td><td><span class="bd <?=$r['status']?>"><?=$r['status']?></span></td><td><?=e($r['unit']?:'-')?></td></tr><?php endforeach;?></table></div><?php adm_foot();
